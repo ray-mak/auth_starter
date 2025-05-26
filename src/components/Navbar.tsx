@@ -1,6 +1,7 @@
 import React from "react"
 import Link from "next/link"
 import ThemeSwitch from "./Themeswitch"
+import HamburgerMenu from "./HamburgerMenu"
 
 const Navbar = () => {
   return (
@@ -9,6 +10,7 @@ const Navbar = () => {
         <Link href="/" className={`text-4xl font-bold`}>
           Technically
         </Link>
+        <HamburgerMenu />
         <ThemeSwitch />
       </div>
     </nav>

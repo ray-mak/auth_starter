@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className={`${ibmPlexMono.className}`}>
         <Providers>
           <Navbar />
-          <main className="mt-20">{children}</main>
+          <main className="mt-24">{children}</main>
         </Providers>
       </body>
     </html>
