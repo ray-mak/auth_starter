@@ -23,10 +23,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${ibmPlexMono.className}`}>
+      <body
+        className={`${ibmPlexMono.className} bg-slate-100 dark:bg-slate-900`}
+      >
         <Providers>
           <Navbar />
-          <main className="mt-24">{children}</main>
+          <main className="mt-20">{children}</main>
         </Providers>
       </body>
     </html>

@@ -1,8 +1,12 @@
+"use server"
+
 import { z } from "zod"
 import { signInSchema, signUpSchema } from "./schemas"
 import { db } from "@/lib/db"
 import { generateSalt, hashPassword } from "./core/passwordHasher"
 import { redirect } from "next/navigation"
+import { createUserSession } from "./core/session"
+import { cookies } from "next/headers"
 
 export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   const { success, data } = signUpSchema.safeParse(unsafeData)
@@ -10,7 +14,7 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   if (!success) return { error: "Error creating account" }
 
   const existingUsername = await db.user.findFirst({
-    where: { email: data.username },
+    where: { username: data.username },
   })
 
   const existingEmail = await db.user.findFirst({
@@ -37,10 +41,14 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
     })
 
     if (user == null) return { error: "Error creating account" }
+
+    await createUserSession(user, await cookies())
+
+    return { success: true }
   } catch (error) {
     console.error("Sign-up failed:", error)
     return { error: "Error creating account" }
   }
 
-  redirect("/")
+  // redirect("/")
 }
