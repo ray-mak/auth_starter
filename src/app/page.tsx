@@ -1,11 +1,19 @@
-import Image from "next/image"
+import { getCurrentUser } from "@/auth/nextjs/currentUser"
+import LogOutButton from "@/components/LogOutButton"
 
-export default function Home() {
+export default async function Home() {
+  const user = await getCurrentUser()
+  console.log(user)
+
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center">
       <p className="text-3xl h-full">
         Real-world coding interviews for every hiring process
       </p>
+      <div className="flex flex-col items-center justify-center mt-8 border w-1/2 gap-4">
+        <p className="p-8 rounded border w-1/2 bg-white">User: {user?.id}</p>
+        <LogOutButton />
+      </div>
     </div>
   )
 }

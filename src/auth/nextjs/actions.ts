@@ -3,10 +3,50 @@
 import { z } from "zod"
 import { signInSchema, signUpSchema } from "./schemas"
 import { db } from "@/lib/db"
-import { generateSalt, hashPassword } from "./core/passwordHasher"
+import {
+  comparePassword,
+  generateSalt,
+  hashPassword,
+} from "../core/passwordHasher"
 import { redirect } from "next/navigation"
-import { createUserSession } from "./core/session"
+import { createUserSession, deleteUserSession } from "../core/session"
 import { cookies } from "next/headers"
+
+export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
+  const { success, data } = signInSchema.safeParse(unsafeData)
+
+  if (!success)
+    return { error: "Invalid email/username or password combination" }
+
+  let user
+
+  if (data.identifier.includes("@")) {
+    user = await db.user.findFirst({
+      where: {
+        email: data.identifier,
+      },
+    })
+  } else {
+    user = await db.user.findFirst({
+      where: {
+        username: data.identifier,
+      },
+    })
+  }
+
+  if (user == null)
+    return { error: "No user found with that username or email." }
+
+  const isPasswordValid = await comparePassword(
+    data.password,
+    user.salt,
+    user.password
+  )
+
+  if (!isPasswordValid) return { error: "Incorrect email or password" }
+
+  await createUserSession(user, await cookies())
+}
 
 export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   const { success, data } = signUpSchema.safeParse(unsafeData)
@@ -51,4 +91,8 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   }
 
   // redirect("/")
+}
+
+export async function logOut() {
+  await deleteUserSession(await cookies())
 }

@@ -10,6 +10,20 @@ export function hashPassword(password: string, salt: string): Promise<string> {
   })
 }
 
+export async function comparePassword(
+  password: string,
+  salt: string,
+  hashedPassword: string
+) {
+  const inputHashPassword = await hashPassword(password, salt)
+
+  //use timingSafeEqual to prevent timing attacks
+  return crypto.timingSafeEqual(
+    Buffer.from(inputHashPassword, "hex"),
+    Buffer.from(hashedPassword, "hex")
+  )
+}
+
 export function generateSalt() {
   return crypto.randomBytes(16).toString("hex").normalize()
 }

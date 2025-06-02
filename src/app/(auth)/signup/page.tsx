@@ -54,6 +54,7 @@ const page = () => {
               placeholder="Username"
               value={form.username}
               onChange={handleForm}
+              autoComplete="new-username"
             />
           </label>
           <label htmlFor="password" className="flex flex-col gap-1">
@@ -66,6 +67,7 @@ const page = () => {
               placeholder="Password"
               value={form.password}
               onChange={handleForm}
+              autoComplete="new-password"
             />
           </label>
           {/* <label htmlFor="confirmPassword" className="flex flex-col gap-1">
@@ -90,6 +92,7 @@ const page = () => {
               placeholder="Email"
               value={form.email}
               onChange={handleForm}
+              autoComplete="new-email"
             />
           </label>
           <button
