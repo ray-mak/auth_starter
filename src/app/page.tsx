@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/auth/nextjs/currentUser"
 import LogOutButton from "@/components/LogOutButton"
 
 export default async function Home() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser({ withFullUser: true })
   console.log(user)
 
   return (
@@ -11,7 +11,9 @@ export default async function Home() {
         Real-world coding interviews for every hiring process
       </p>
       <div className="flex flex-col items-center justify-center mt-8 border w-1/2 gap-4">
-        <p className="p-8 rounded border w-1/2 bg-white">User: {user?.id}</p>
+        <p className="p-8 rounded border w-1/2 bg-white">
+          User: {user?.username}
+        </p>
         <LogOutButton />
       </div>
     </div>
