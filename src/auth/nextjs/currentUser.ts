@@ -4,6 +4,7 @@ import { cookies } from "next/headers"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 
+// ReturnType is used to get return type of getUserFromDatabase (user|null). Awaited is used since getUserFromDatabase is async. Exclude removes unwanted types, in this case is undefined and null.
 type FullUser = Exclude<
   Awaited<ReturnType<typeof getUserFromDatabase>>,
   undefined | null

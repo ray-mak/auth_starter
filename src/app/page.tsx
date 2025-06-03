@@ -10,12 +10,14 @@ export default async function Home() {
       <p className="text-3xl h-full">
         Real-world coding interviews for every hiring process
       </p>
-      <div className="flex flex-col items-center justify-center mt-8 border w-1/2 gap-4">
-        <p className="p-8 rounded border w-1/2 bg-white">
-          User: {user?.username}
-        </p>
-        <LogOutButton />
-      </div>
+      {user && (
+        <div className="flex flex-col items-center justify-center mt-8 border w-1/2 gap-4">
+          <p className="p-8 rounded border w-1/2 bg-white">
+            User: {user?.username}
+          </p>
+          <LogOutButton />
+        </div>
+      )}
     </div>
   )
 }
