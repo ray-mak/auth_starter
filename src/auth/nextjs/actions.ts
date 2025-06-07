@@ -11,6 +11,11 @@ import {
 import { redirect } from "next/navigation"
 import { createUserSession, deleteUserSession } from "../core/session"
 import { cookies } from "next/headers"
+import { OAuthClient } from "../core/oauth/base"
+
+const oAuthProviders = ["google", "github", "discord"] as const
+
+type OAuthProvider = (typeof oAuthProviders)[number]
 
 export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
   const { success, data } = signInSchema.safeParse(unsafeData)
@@ -95,4 +100,8 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
 
 export async function logOut() {
   await deleteUserSession(await cookies())
+}
+
+export async function oAuthSignIn(provider: OAuthProvider) {
+  redirect(new OAuthClient().createAuthUrl(await cookies()))
 }

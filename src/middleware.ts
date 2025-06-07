@@ -7,7 +7,7 @@ import {
 const privateRoutes = ["/private"]
 const adminRoutes = ["/admin"]
 
-export async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const response = (await middlewareAuth(request)) ?? NextResponse.next()
 
   await updateUserSessionExpiration({
