@@ -12,10 +12,13 @@ import { redirect } from "next/navigation"
 import { createUserSession, deleteUserSession } from "../core/session"
 import { cookies } from "next/headers"
 import { OAuthClient } from "../core/oauth/base"
+import { OAuthProvider, PrismaClient } from "@prisma/client"
 
-const oAuthProviders = ["google", "github", "discord"] as const
+// const oAuthProviders = ["google", "github", "discord"] as const
 
-type OAuthProvider = (typeof oAuthProviders)[number]
+// type OAuthProvider = (typeof oAuthProviders)[number]
+
+const prima = new PrismaClient()
 
 export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
   const { success, data } = signInSchema.safeParse(unsafeData)

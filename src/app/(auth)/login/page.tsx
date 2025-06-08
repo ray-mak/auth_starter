@@ -1,15 +1,14 @@
-"use client"
+import React from "react"
+import SignInPageClient from "./SignInPageClient"
 
-import LoginForm from "@/components/LoginForm"
+const SignInPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ oauthError?: string }>
+}) => {
+  const { oauthError } = await searchParams
 
-const page = () => {
-  return (
-    <div>
-      <div className="flex flex-col items-center justify-center">
-        <LoginForm />
-      </div>
-    </div>
-  )
+  return <SignInPageClient oauthError={oauthError} />
 }
 
-export default page
+export default SignInPage
