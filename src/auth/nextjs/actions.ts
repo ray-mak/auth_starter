@@ -11,7 +11,7 @@ import {
 import { redirect } from "next/navigation"
 import { createUserSession, deleteUserSession } from "../core/session"
 import { cookies } from "next/headers"
-import { OAuthClient } from "../core/oauth/base"
+import { getOAuthClient, OAuthClient } from "../core/oauth/base"
 import { OAuthProvider, PrismaClient } from "@prisma/client"
 
 // const oAuthProviders = ["google", "github", "discord"] as const
@@ -42,7 +42,7 @@ export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
     })
   }
 
-  if (user == null)
+  if (user == null || user.password == null || user.salt == null)
     return { error: "No user found with that username or email." }
 
   const isPasswordValid = await comparePassword(
@@ -106,5 +106,6 @@ export async function logOut() {
 }
 
 export async function oAuthSignIn(provider: OAuthProvider) {
-  redirect(new OAuthClient().createAuthUrl(await cookies()))
+  const oAuthClient = getOAuthClient(provider)
+  redirect(oAuthClient.createAuthUrl(await cookies()))
 }

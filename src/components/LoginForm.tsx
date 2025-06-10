@@ -73,6 +73,12 @@ const LoginForm = () => {
       <button type="button" onClick={async () => await oAuthSignIn("discord")}>
         Discord
       </button>
+      <button type="button" onClick={async () => await oAuthSignIn("google")}>
+        Google
+      </button>
+      <button type="button" onClick={async () => await oAuthSignIn("github")}>
+        Github
+      </button>
     </form>
   )
 }
