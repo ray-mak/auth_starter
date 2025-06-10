@@ -1,5 +1,11 @@
 import { z } from "zod"
 import { Cookies } from "../session"
+import crypto from "crypto"
+import { ur } from "zod/v4/locales"
+
+const STATE_COOKIE_KEY = "oAuthState"
+const CODE_VERIFIER_COOKIE_KEY = "oAuthCodeVerifier"
+const COOKIE_EXPIRATION_SECONDS = 60 * 10
 
 export class OAuthClient<T> {
   private readonly tokenSchema = z.object({
@@ -19,6 +25,9 @@ export class OAuthClient<T> {
   }
 
   createAuthUrl(cookies: Pick<Cookies, "set">) {
+    const state = createState(cookies)
+    const codeVerifier = createCodeVerifier(cookies)
+
     const url = new URL("https://discord.com/oauth2/authorize")
 
     url.searchParams.set("client_id", process.env.DISCORD_CLIENT_ID as string)
@@ -27,11 +36,24 @@ export class OAuthClient<T> {
     url.searchParams.set("response_type", "code")
     url.searchParams.set("scope", "identify email")
 
+    url.searchParams.set("state", state)
+    url.searchParams.set("code_challenge_method", "S256")
+    url.searchParams.set(
+      "code_challenge",
+      crypto.hash("sha256", codeVerifier, "base64url")
+    )
+
     return url.toString()
   }
 
-  async fetchUser(code: string) {
-    const { accessToken, tokenType } = await this.fetchToken(code)
+  async fetchUser(code: string, state: string, cookies: Pick<Cookies, "get">) {
+    const isValidState = await validateState(state, cookies)
+    if (!isValidState) throw new InvalidStateError()
+
+    const { accessToken, tokenType } = await this.fetchToken(
+      code,
+      getCodeVerifier(cookies)
+    )
 
     const user = await fetch("https://discord.com/api/users/@me", {
       headers: {
@@ -52,7 +74,7 @@ export class OAuthClient<T> {
     }
   }
 
-  private fetchToken(code: string) {
+  private fetchToken(code: string, codeVerifier: string) {
     return fetch("https://discord.com/api/oauth2/token", {
       method: "POST",
       headers: {
@@ -65,6 +87,7 @@ export class OAuthClient<T> {
         grant_type: "authorization_code",
         client_id: process.env.DISCORD_CLIENT_ID as string,
         client_secret: process.env.DISCORD_CLIENT_SECRET as string,
+        code_verifier: codeVerifier,
       }),
     })
       .then((res) => res.json())
@@ -94,4 +117,51 @@ export class InvalidUserError extends Error {
     super("Invalid User")
     this.cause = zodError
   }
+}
+
+export class InvalidStateError extends Error {
+  constructor() {
+    super("Invalid State")
+  }
+}
+
+export class InvalidCodeVerifierError extends Error {
+  constructor() {
+    super("Invalid Code Verifier")
+  }
+}
+
+function createState(cookies: Pick<Cookies, "set">) {
+  const state = crypto.randomBytes(64).toString("hex").normalize()
+  cookies.set(STATE_COOKIE_KEY, state, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "lax",
+    expires: Date.now() + COOKIE_EXPIRATION_SECONDS * 1000,
+  })
+
+  return state
+}
+
+function createCodeVerifier(cookies: Pick<Cookies, "set">) {
+  const codeVerifier = crypto.randomBytes(64).toString("hex").normalize()
+  cookies.set(CODE_VERIFIER_COOKIE_KEY, codeVerifier, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "lax",
+    expires: Date.now() + COOKIE_EXPIRATION_SECONDS * 1000,
+  })
+
+  return codeVerifier
+}
+
+function validateState(state: string, cookies: Pick<Cookies, "get">) {
+  const cookieState = cookies.get(STATE_COOKIE_KEY)?.value
+  return cookieState === state
+}
+
+function getCodeVerifier(cookies: Pick<Cookies, "get">) {
+  const codeVerifier = cookies.get(CODE_VERIFIER_COOKIE_KEY)?.value
+  if (codeVerifier == null) throw new InvalidCodeVerifierError()
+  return codeVerifier
 }
