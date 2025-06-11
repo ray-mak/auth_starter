@@ -5,6 +5,7 @@ import { ur } from "zod/v4/locales"
 import { OAuthProvider } from "@prisma/client"
 import { createDiscordOAuthClient } from "./discord"
 import { createGithubOAuthClient } from "./github"
+import { createGoogleOAuthClient } from "./google"
 
 const STATE_COOKIE_KEY = "oAuthState"
 const CODE_VERIFIER_COOKIE_KEY = "oAuthCodeVerifier"
@@ -154,7 +155,7 @@ export function getOAuthClient(provider: OAuthProvider) {
     case "discord":
       return createDiscordOAuthClient()
     case "google":
-      return createDiscordOAuthClient()
+      return createGoogleOAuthClient()
     case "github":
       return createGithubOAuthClient()
     default:
