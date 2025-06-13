@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/auth/nextjs/currentUser"
 import LogOutButton from "@/components/LogOutButton"
+import UpdatePasswordForm from "@/components/UpdatePasswordForm"
 
 export default async function Home() {
   const user = await getCurrentUser({ withFullUser: true })
@@ -18,6 +19,7 @@ export default async function Home() {
           <LogOutButton />
         </div>
       )}
+      {user && <UpdatePasswordForm userId={user?.id} />}
     </div>
   )
 }

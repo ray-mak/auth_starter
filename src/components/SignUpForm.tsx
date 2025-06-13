@@ -22,7 +22,7 @@ const SignUpForm = () => {
   }
 
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
-    console.log("Submitting form", data)
+    // console.log("Submitting form", data)
     const result = await signUp(data)
 
     if (result?.error) {
@@ -33,6 +33,8 @@ const SignUpForm = () => {
       redirect("/")
     }
   }
+
+  console.log(error)
   return (
     <form
       className="flex flex-col sm:w-[420px] w-[320px] gap-4 mt-16 p-8 rounded bg-white dark:bg-slate-800 shadow-xl"

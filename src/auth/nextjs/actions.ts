@@ -1,7 +1,7 @@
 "use server"
 
 import { z } from "zod"
-import { signInSchema, signUpSchema } from "./schemas"
+import { signInSchema, signUpSchema, updatePasswordSchema } from "./schemas"
 import { db } from "@/lib/db"
 import {
   comparePassword,
@@ -13,10 +13,6 @@ import { createUserSession, deleteUserSession } from "../core/session"
 import { cookies } from "next/headers"
 import { getOAuthClient, OAuthClient } from "../core/oauth/base"
 import { OAuthProvider, PrismaClient } from "@prisma/client"
-
-// const oAuthProviders = ["google", "github", "discord"] as const
-
-// type OAuthProvider = (typeof oAuthProviders)[number]
 
 const prima = new PrismaClient()
 
@@ -69,10 +65,43 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
     where: {
       email: data.email,
     },
+    include: {
+      oauthAccounts: true,
+    },
   })
 
-  if (existingEmail != null || existingUsername != null)
-    return { error: "Account with this username or email already exists" }
+  if (
+    existingUsername != null ||
+    (existingEmail != null && existingEmail.oauthAccounts.length == 0)
+  )
+    return { error: "Account with this username already exists" }
+
+  //if user already has oauth account, update account.
+  if (existingEmail && existingEmail.oauthAccounts.length > 0) {
+    try {
+      const salt = generateSalt()
+      const hashedPassword = await hashPassword(data.password, salt)
+
+      const user = await db.user.update({
+        where: {
+          email: data.email,
+        },
+        data: {
+          password: hashedPassword,
+          salt: salt,
+        },
+      })
+
+      if (user == null) return { error: "Error creating account" }
+
+      await createUserSession(user, await cookies())
+
+      return { success: true }
+    } catch (error) {
+      console.error("Sign-up failed:", error)
+      return { error: "Error creating account" }
+    }
+  }
 
   try {
     const salt = generateSalt()
@@ -99,6 +128,55 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   }
 
   // redirect("/")
+}
+
+//TODO: email confirmation
+export async function updatePassword(
+  unsafeData: z.infer<typeof updatePasswordSchema>
+) {
+  const { success, data } = updatePasswordSchema.safeParse(unsafeData)
+
+  if (!success) return { error: "Error updating account" }
+
+  const existingUser = await db.user.findFirst({
+    where: {
+      id: data.userId,
+    },
+  })
+
+  if (!existingUser || !existingUser.salt || !existingUser.password)
+    return { error: "Could not find user" }
+
+  const isPasswordValid = await comparePassword(
+    data.password,
+    existingUser.salt,
+    existingUser.password
+  )
+
+  if (!isPasswordValid) return { error: "Incorrect current password" }
+
+  try {
+    const salt = generateSalt()
+
+    const hashedPassword = await hashPassword(data.newPassword, salt)
+
+    const user = await db.user.update({
+      where: {
+        id: data.userId,
+      },
+      data: {
+        password: hashedPassword,
+        salt: salt,
+      },
+    })
+
+    if (user == null) return { error: "Error updating account" }
+
+    return { success: true }
+  } catch (error) {
+    console.error("Account update failed:", error)
+    return { error: "Error updating account" }
+  }
 }
 
 export async function logOut() {
