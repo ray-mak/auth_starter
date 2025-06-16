@@ -12,7 +12,9 @@ import { redirect } from "next/navigation"
 import { createUserSession, deleteUserSession } from "../core/session"
 import { cookies } from "next/headers"
 import { getOAuthClient, OAuthClient } from "../core/oauth/base"
-import { OAuthProvider, PrismaClient } from "@prisma/client"
+import { OAuthProviders, PrismaClient } from "@prisma/client"
+import { randomBytes } from "crypto"
+import { sendVerificationEmail } from "@/lib/verifyEmail"
 
 const prima = new PrismaClient()
 
@@ -89,6 +91,7 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
         data: {
           password: hashedPassword,
           salt: salt,
+          isVerified: true,
         },
       })
 
@@ -107,6 +110,7 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
     const salt = generateSalt()
 
     const hashedPassword = await hashPassword(data.password, salt)
+    const verifyToken = randomBytes(32).toString("hex").normalize()
 
     const user = await db.user.create({
       data: {
@@ -114,10 +118,14 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
         email: data.email,
         password: hashedPassword,
         salt: salt,
+        verifyToken: verifyToken,
+        verifyTokenExpires: new Date(Date.now() + 1000 * 60 * 60),
       },
     })
 
     if (user == null) return { error: "Error creating account" }
+
+    await sendVerificationEmail(data.email, verifyToken)
 
     await createUserSession(user, await cookies())
 
@@ -183,7 +191,7 @@ export async function logOut() {
   await deleteUserSession(await cookies())
 }
 
-export async function oAuthSignIn(provider: OAuthProvider) {
+export async function oAuthSignIn(provider: OAuthProviders) {
   const oAuthClient = getOAuthClient(provider)
   redirect(oAuthClient.createAuthUrl(await cookies()))
 }

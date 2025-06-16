@@ -1,7 +1,7 @@
 import { getOAuthClient, OAuthClient } from "@/auth/core/oauth/base"
 import { createUserSession } from "@/auth/core/session"
 import { db } from "@/lib/db"
-import { OAuthProvider, PrismaClient } from "@prisma/client"
+import { OAuthProviders, PrismaClient } from "@prisma/client"
 import { redirect } from "next/navigation"
 import { NextRequest } from "next/server"
 import { z } from "zod"
@@ -45,7 +45,7 @@ export async function GET(
 
 function connectUserToAccount(
   { id, email, name }: { id: string; email: string; name: string },
-  provider: OAuthProvider
+  provider: OAuthProviders
 ) {
   return db.$transaction(async (tx) => {
     let user = await tx.user.findFirst({

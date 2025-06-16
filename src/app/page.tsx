@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/auth/nextjs/currentUser"
 import LogOutButton from "@/components/LogOutButton"
+import SendVerificationEmailBtn from "@/components/SendVerificationEmailBtn"
 import UpdatePasswordForm from "@/components/UpdatePasswordForm"
 
 export default async function Home() {
@@ -16,6 +17,14 @@ export default async function Home() {
           <p className="p-8 rounded border w-1/2 bg-white">
             User: {user?.username}
           </p>
+          {user.email && (
+            <div>
+              Email: {user.email}
+              {!user.isVerified && (
+                <SendVerificationEmailBtn email={user.email} />
+              )}
+            </div>
+          )}
           <LogOutButton />
         </div>
       )}

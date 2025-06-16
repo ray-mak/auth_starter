@@ -2,7 +2,7 @@ import { z } from "zod"
 import { Cookies } from "../session"
 import crypto from "crypto"
 import { ur } from "zod/v4/locales"
-import { OAuthProvider } from "@prisma/client"
+import { OAuthProviders } from "@prisma/client"
 import { createDiscordOAuthClient } from "./discord"
 import { createGithubOAuthClient } from "./github"
 import { createGoogleOAuthClient } from "./google"
@@ -12,7 +12,7 @@ const CODE_VERIFIER_COOKIE_KEY = "oAuthCodeVerifier"
 const COOKIE_EXPIRATION_SECONDS = 60 * 10
 
 export class OAuthClient<T> {
-  private readonly provider: OAuthProvider
+  private readonly provider: OAuthProviders
   private readonly clientId: string
   private readonly clientSecret: string
   private readonly scopes: string[]
@@ -47,7 +47,7 @@ export class OAuthClient<T> {
     urls,
     userInfo,
   }: {
-    provider: OAuthProvider
+    provider: OAuthProviders
     clientId: string
     clientSecret: string
     scopes: string[]
@@ -150,7 +150,7 @@ export class OAuthClient<T> {
   }
 }
 
-export function getOAuthClient(provider: OAuthProvider) {
+export function getOAuthClient(provider: OAuthProviders) {
   switch (provider) {
     case "discord":
       return createDiscordOAuthClient()

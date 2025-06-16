@@ -1,7 +1,9 @@
 "use client"
 
+import { POST } from "@/app/api/email/route"
 import { updatePassword } from "@/auth/nextjs/actions"
 import { getCurrentUser } from "@/auth/nextjs/currentUser"
+import { sendEmail } from "@/lib/email"
 import { redirect } from "next/navigation"
 import { useState } from "react"
 
