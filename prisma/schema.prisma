@@ -38,6 +38,8 @@ model User {
   isVerified Boolean @default(false)
   verifyToken String?
   verifyTokenExpires DateTime?
+  resetToken String?
+  resetTokenExpires DateTime?
   oauthAccounts OAuthAccount[]
 }
 

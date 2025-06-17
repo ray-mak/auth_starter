@@ -38,10 +38,8 @@ const UpdatePasswordForm = ({ userId }: { userId: string }) => {
     })
 
     if (result?.error) {
-      console.log("error")
       setPasswordError(result.error)
     } else {
-      console.log("success")
       redirect("/")
     }
   }

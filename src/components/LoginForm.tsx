@@ -2,6 +2,7 @@
 
 import { oAuthSignIn, signIn } from "@/auth/nextjs/actions"
 import { signInSchema } from "@/auth/nextjs/schemas"
+import Link from "next/link"
 import { redirect } from "next/navigation"
 import React, { useState } from "react"
 import { z } from "zod"
@@ -64,6 +65,9 @@ const LoginForm = () => {
         />
       </label>
       {error && <p className="text-red-500">{error}</p>}
+      <Link href="/account/reset" className="text-blue-600 text-sm underline ">
+        Forgot Password?
+      </Link>
       <button
         type="submit"
         className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
