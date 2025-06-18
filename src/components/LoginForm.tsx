@@ -65,7 +65,10 @@ const LoginForm = () => {
         />
       </label>
       {error && <p className="text-red-500">{error}</p>}
-      <Link href="/account/reset" className="text-blue-600 text-sm underline ">
+      <Link
+        href="/reset-password/request"
+        className="text-blue-600 text-sm underline "
+      >
         Forgot Password?
       </Link>
       <button

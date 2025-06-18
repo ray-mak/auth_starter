@@ -1,13 +1,12 @@
 "use client"
 
-import { POST } from "@/app/api/email/route"
 import { updatePassword } from "@/auth/nextjs/actions"
-import { getCurrentUser } from "@/auth/nextjs/currentUser"
-import { sendEmail } from "@/lib/email"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
+
 import { useState } from "react"
 
 const UpdatePasswordForm = ({ userId }: { userId: string }) => {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -39,9 +38,9 @@ const UpdatePasswordForm = ({ userId }: { userId: string }) => {
 
     if (result?.error) {
       setPasswordError(result.error)
-    } else {
-      redirect("/")
     }
+
+    router.push("/login")
   }
 
   return (

@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 
   if (!user)
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/token-expired`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/verify/expired`
     )
 
   await db.user.update({
@@ -34,6 +34,6 @@ export async function GET(req: Request) {
   })
 
   return NextResponse.redirect(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/email-verified`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/verify/success`
   )
 }

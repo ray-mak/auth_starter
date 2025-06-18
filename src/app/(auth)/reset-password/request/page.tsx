@@ -1,7 +1,7 @@
 import PasswordResetForm from "@/components/PasswordResetForm"
 import React from "react"
 
-const page = () => {
+const PasswordResetRequestPage = () => {
   return (
     <div className="flex flex-col items-center justify-center">
       <PasswordResetForm />
@@ -9,4 +9,4 @@ const page = () => {
   )
 }
 
-export default page
+export default PasswordResetRequestPage

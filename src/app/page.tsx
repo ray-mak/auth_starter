@@ -23,6 +23,7 @@ export default async function Home() {
               {!user.isVerified && (
                 <SendVerificationEmailBtn email={user.email} />
               )}
+              <SendVerificationEmailBtn email={user.email} />
             </div>
           )}
           <LogOutButton />

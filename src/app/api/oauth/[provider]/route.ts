@@ -1,13 +1,13 @@
-import { getOAuthClient, OAuthClient } from "@/auth/core/oauth/base"
+import { getOAuthClient } from "@/auth/core/oauth/base"
 import { createUserSession } from "@/auth/core/session"
 import { db } from "@/lib/db"
-import { OAuthProviders, PrismaClient } from "@prisma/client"
+import { OAuthProviders } from "@prisma/client"
 import { redirect } from "next/navigation"
 import { NextRequest } from "next/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
 
-const prisma = new PrismaClient()
+// const prisma = new PrismaClient()
 
 export async function GET(
   request: NextRequest,

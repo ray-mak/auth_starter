@@ -22,7 +22,7 @@ const PasswordResetForm = () => {
       })
 
       if (res.ok) {
-        router.push("/account/reset-sent")
+        router.push("/reset-password/sent")
       }
     } catch (error) {
       console.error(error)

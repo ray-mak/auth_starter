@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { Cookies } from "../session"
 import crypto from "crypto"
-import { ur } from "zod/v4/locales"
+// import { ur } from "zod/v4/locales"
 import { OAuthProviders } from "@prisma/client"
 import { createDiscordOAuthClient } from "./discord"
 import { createGithubOAuthClient } from "./github"
@@ -87,10 +87,7 @@ export class OAuthClient<T> {
 
     url.searchParams.set("state", state)
     url.searchParams.set("code_challenge_method", "S256")
-    url.searchParams.set(
-      "code_challenge",
-      crypto.hash("sha256", codeVerifier, "base64url")
-    )
+    url.searchParams.set("code_challenge", createCodeChallenge(codeVerifier))
 
     return url.toString()
   }
@@ -222,4 +219,13 @@ function getCodeVerifier(cookies: Pick<Cookies, "get">) {
   const codeVerifier = cookies.get(CODE_VERIFIER_COOKIE_KEY)?.value
   if (codeVerifier == null) throw new InvalidCodeVerifierError()
   return codeVerifier
+}
+
+function createCodeChallenge(codeVerifier: string): string {
+  const hash = crypto.createHash("sha256").update(codeVerifier).digest()
+  return hash
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "")
 }

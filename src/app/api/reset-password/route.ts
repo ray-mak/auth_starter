@@ -21,10 +21,12 @@ export async function GET(req: Request) {
 
   if (!user)
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/token-expired`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/verify/expired`
     )
 
-  return NextResponse.redirect(`${baseUrl}/reset-password?token=${token}`)
+  return NextResponse.redirect(
+    `${baseUrl}/reset-password/confirm?token=${token}`
+  )
 }
 
 export async function POST(req: Request) {
@@ -66,7 +68,10 @@ export async function POST(req: Request) {
     })
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: "Error resetting password" })
+    return NextResponse.json(
+      { error: "Error resetting password" },
+      { status: 400 }
+    )
   }
 
   return NextResponse.json(

@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import React, { useState } from "react"
 
-const page = () => {
+const ResetPasswordPage = () => {
   const router = useRouter()
   const token = useSearchParams().get("token")
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ const page = () => {
         setPasswordError(result.error)
       }
 
-      router.push("/reset-success")
+      router.push("/reset-password/success")
     } catch (error) {
       console.error("Unexpected error: ", error)
       setPasswordError("Something went wrong")
@@ -93,4 +93,4 @@ const page = () => {
   )
 }
 
-export default page
+export default ResetPasswordPage

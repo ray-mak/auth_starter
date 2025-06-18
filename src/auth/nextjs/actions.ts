@@ -11,12 +11,12 @@ import {
 import { redirect } from "next/navigation"
 import { createUserSession, deleteUserSession } from "../core/session"
 import { cookies } from "next/headers"
-import { getOAuthClient, OAuthClient } from "../core/oauth/base"
-import { OAuthProviders, PrismaClient } from "@prisma/client"
+import { getOAuthClient } from "../core/oauth/base"
+import { OAuthProviders } from "@prisma/client"
 import { randomBytes } from "crypto"
 import { sendVerificationEmail } from "@/lib/verifyEmail"
 
-const prima = new PrismaClient()
+// const prima = new PrismaClient()
 
 export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
   const { success, data } = signInSchema.safeParse(unsafeData)
