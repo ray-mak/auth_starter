@@ -8,7 +8,6 @@ Included is a simple UI for user sign-in and sign-up. It also includes a simple 
 
 - Style the email verified and expired token pages.
 - Implement rate limiting for password reset and email verification.
-- Reconfigure directories for authentication/verification/reset.
 
 ## NOTES
 
