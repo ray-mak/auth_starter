@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 const PasswordResetForm = () => {
   const router = useRouter()
   const [email, setEmail] = React.useState("")
+  const [error, setError] = React.useState("")
 
   function handleForm(e: React.ChangeEvent<HTMLInputElement>) {
     setEmail(e.target.value)
@@ -23,6 +24,11 @@ const PasswordResetForm = () => {
 
       if (res.ok) {
         router.push("/reset-password/sent")
+      }
+
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error)
       }
     } catch (error) {
       console.error(error)
@@ -46,6 +52,7 @@ const PasswordResetForm = () => {
         onChange={handleForm}
         className="mb-4 p-2 border rounded-sm"
       />
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <button
         type="submit"
         className="py-2 px-4 rounded border bg-blue-500 text-white hover:bg-blue-600"
